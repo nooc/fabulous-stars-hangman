@@ -4,4 +4,4 @@ By Fabulous Stars
 
 ## About
 
-A Hangman guessing game...
+A Hangman word guessing game.

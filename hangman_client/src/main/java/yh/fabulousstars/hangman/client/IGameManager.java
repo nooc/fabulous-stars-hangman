@@ -12,16 +12,16 @@ public interface IGameManager {
 
     /**
      * Create a new game.
+     * Generates a GameCreated or CreateFailed.
      * @param name Game name
+     * @param playerName Player name
      * @param password Password
-     * @return Success or fail
      */
-    boolean createGame(String name, String password);
+    void createGame(String name, String playerName, String password);
 
     /**
-     * Delete empty game.
-     * @param game
-     * @return Success or fail.
+     * Get this clients unique session id.
+     * @return is
      */
-    boolean deleteGame(IGame game);
+    String getClientId();
 }

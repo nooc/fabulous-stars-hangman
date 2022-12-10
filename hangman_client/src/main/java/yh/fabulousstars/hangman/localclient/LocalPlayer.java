@@ -5,35 +5,23 @@ import yh.fabulousstars.hangman.client.IPlayer;
 import yh.fabulousstars.hangman.client.PlayerState;
 
 public class LocalPlayer implements IPlayer {
-    private static long playerIdCounter = 100;
-    private final long id;
+    private final String clientId;
     private final LocalGame game;
     private final String name;
     private PlayerState state;
     private int damage;
-    private boolean owner;
 
-    LocalPlayer(LocalGame game, String name) {
-        this.id = playerIdCounter++;
+    LocalPlayer(LocalGame game, String name, String clientId) {
+        this.clientId = clientId;
         this.game = game;
         this.name = name;
         this.state = PlayerState.Initial;
         this.damage = 0;
-        this.owner = false;
     }
 
     @Override
-    public long getId() {
-        return id;
-    }
-
-    @Override
-    public boolean isOwner() {
-        return owner;
-    }
-
-    void setOwner() {
-        owner = true;
+    public String getClientId() {
+        return clientId;
     }
 
     @Override

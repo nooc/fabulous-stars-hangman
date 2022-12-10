@@ -43,10 +43,11 @@ public interface IGame {
     IPlayer getMe();
 
     /**
-     * Join a game.
-     * @return Success or false.
+     * Join player to game.
+     * @param player
+     * @param password
      */
-    boolean joinGame(String playerName, String password);
+    void joinGame(IPlayer player, String password);
 
     /**
      * Perform a submit.

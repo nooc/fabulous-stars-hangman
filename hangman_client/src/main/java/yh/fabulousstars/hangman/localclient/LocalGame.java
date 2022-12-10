@@ -4,6 +4,7 @@ import yh.fabulousstars.hangman.client.IGame;
 import yh.fabulousstars.hangman.client.IGameManager;
 import yh.fabulousstars.hangman.client.IPlayer;
 import yh.fabulousstars.hangman.client.PlayerState;
+import yh.fabulousstars.hangman.client.events.FailedToJoin;
 import yh.fabulousstars.hangman.client.events.PlayerJoined;
 
 import java.util.ArrayList;
@@ -19,14 +20,14 @@ public class LocalGame implements IGame {
     private List<LocalPlayer> players;
     private IPlayer me;
 
-    LocalGame(GameManager manager, String gameName, String playerName, String password) {
+    LocalGame(GameManager manager, String gameName, String playerName, String clientId, String password) {
         this.id = gameIdCounter++;
         this.manager = manager;
         this.name = gameName;
         this.password = password;
         this.theme = null;
         players = new ArrayList<>();
-        me = new LocalPlayer(this, playerName);
+        me = new LocalPlayer(this, playerName, clientId);
 
     }
 
@@ -61,14 +62,14 @@ public class LocalGame implements IGame {
     }
 
     @Override
-    public boolean joinGame(String playerName, String password) {
-        if(this.password.equals(password)) {
-            var player = new LocalPlayer(this, playerName);
-            players.add(player);
+    public void joinGame(IPlayer player, String password) {
+        if(this.password.equals(password) && player.getGame().equals(this)) {
+            players.add((LocalPlayer)player);
             manager.sendEvent(new PlayerJoined(this, player));
-            return true;
+            ((GameManager)getManager()).sendEvent(new PlayerJoined(this, player));
+        } else {
+            ((GameManager) getManager()).sendEvent(new FailedToJoin(this));
         }
-        return false;
     }
 
     @Override

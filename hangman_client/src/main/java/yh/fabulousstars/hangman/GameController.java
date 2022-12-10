@@ -1,9 +1,11 @@
 package yh.fabulousstars.hangman;
 
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import yh.fabulousstars.hangman.client.IGame;
 import yh.fabulousstars.hangman.client.IGameEvent;
 import yh.fabulousstars.hangman.client.events.GameStarted;
 import yh.fabulousstars.hangman.client.events.PlayerDamage;
@@ -15,6 +17,12 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class GameController implements Initializable {
+
+    enum UISection {
+        Create,
+        Join
+    }
+
     @FXML
     public TextArea logTextArea;
     @FXML
@@ -22,26 +30,56 @@ public class GameController implements Initializable {
     @FXML
     public TextField gameNameField;
     @FXML
+    public TextField playerNameField;
+    @FXML
     public TextField joinPasswordField;
     @FXML
-    public ListView gameList;
+    public ListView<IGame> gameListView;
     @FXML
     public Button joinButton;
     private GameManager gameManager;
+    private ObservableList<IGame> gameList;
 
+    /**
+     * Create game clicked.
+     * @param event
+     */
     @FXML
-    public void onCreateButtonClick(ActionEvent actionEvent) {
+    public void onCreateButtonClick(ActionEvent event) {
 
         var name = gameNameField.getText().strip();
+        var playerName = playerNameField.getText().strip();
         var password = joinPasswordField.getText();
-        if(!name.isEmpty()) {
-            if(gameManager.createGame(name, password)) {
-                createButton.setDisable(true);
+        if(!(name.isEmpty() || playerName.isEmpty())) {
+            setUIState(false, UISection.Create, UISection.Join);
+            gameManager.createGame(name, playerName, password);
+        } else {
+            //TODO: Show error
+        }
+    }
+
+    /**
+     * Enable of disable UI section.
+     * @param enabled Boolean
+     * @param sections Sections
+     */
+    private void setUIState(boolean enabled, UISection... sections) {
+        for(var section : sections){
+            if(section.equals(UISection.Create)) {
+                gameNameField.setDisable(!enabled);
+                playerNameField.setDisable(!enabled);
+                joinPasswordField.setDisable(!enabled);
+                createButton.setDisable(!enabled);
+            } else if (section.equals(UISection.Join)) {
+                gameListView.setDisable(!enabled);
+                joinButton.setDisable(!enabled);
             }
         }
     }
+
     @FXML
-    public void onJoinButtonClick(ActionEvent actionEvent) {
+    public void onJoinButtonClick(ActionEvent event) {
+        var game = gameListView.getSelectionModel().getSelectedItem();
     }
 
     /**
@@ -57,8 +95,7 @@ public class GameController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        gameList.setDisable(true);
-
+        setUIState(false, UISection.Join);
         gameManager = new GameManager(this::handleGameEvent);
     }
 

@@ -3,16 +3,10 @@ package yh.fabulousstars.hangman.client;
 public interface IPlayer {
 
     /**
-     * Get player id.
-     * @return Player id
+     * Get client id for this player.
+     * @return Client id
      */
-    long getId();
-
-    /**
-     * Check if player is owner/creator.
-     * @return True or false
-     */
-    boolean isOwner();
+    String getClientId();
 
     /**
      * Get game instance this player belongs to.

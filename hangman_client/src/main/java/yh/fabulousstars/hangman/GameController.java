@@ -16,6 +16,7 @@ import yh.fabulousstars.hangman.client.events.GameStarted;
 import yh.fabulousstars.hangman.client.events.PlayerDamage;
 import yh.fabulousstars.hangman.client.events.PlayerJoined;
 import yh.fabulousstars.hangman.client.events.SubmitWord;
+import yh.fabulousstars.hangman.gui.CanvasClass;
 import yh.fabulousstars.hangman.localclient.GameManager;
 
 import java.net.URL;
@@ -29,6 +30,7 @@ public class GameController implements Initializable {
         Create,
         Join
     }
+
     @FXML
     private Pane parentPane;
 
@@ -42,7 +44,12 @@ public class GameController implements Initializable {
         System.out.println("initialize method called");
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setFill(Color.BLUE);
-        gc.fillRect(0, 0, 200, 150);
+        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        gc.setStroke(Color.BLACK);
+        gc.moveTo(0,0);
+        gc.lineTo(canvas.getWidth()*0.5,0);
+        gc.stroke();
+
     }
     @FXML
     public Button createButton;
@@ -115,6 +122,12 @@ public class GameController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
+        System.out.println("Initialized");
+        addRectangle();
+
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        gc.setFill(Color.BLACK);
+        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         setUIState(false, UISection.Join);
         gameManager = new GameManager(this::handleGameEvent);
     }

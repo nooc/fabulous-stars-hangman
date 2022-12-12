@@ -4,7 +4,12 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import yh.fabulousstars.hangman.client.IGame;
 import yh.fabulousstars.hangman.client.IGameEvent;
 import yh.fabulousstars.hangman.client.events.GameStarted;
@@ -18,13 +23,27 @@ import java.util.ResourceBundle;
 
 public class GameController implements Initializable {
 
+
+
     enum UISection {
         Create,
         Join
     }
+    @FXML
+    private Pane parentPane;
+
+    @FXML
+    private Canvas canvas;
 
     @FXML
     public TextArea logTextArea;
+    @FXML
+    public void addRectangle() {
+        System.out.println("initialize method called");
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        gc.setFill(Color.BLUE);
+        gc.fillRect(0, 0, 200, 150);
+    }
     @FXML
     public Button createButton;
     @FXML
@@ -47,6 +66,7 @@ public class GameController implements Initializable {
     @FXML
     public void onCreateButtonClick(ActionEvent event) {
 
+        addRectangle();
         var name = gameNameField.getText().strip();
         var playerName = playerNameField.getText().strip();
         var password = joinPasswordField.getText();

@@ -13,11 +13,14 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.layout.Pane?>
 <VBox alignment="CENTER" spacing="20.0" style="-fx-background-color: lightblue; -fx-font-family: sans-serif; -fx-font-size: 14; -fx-font-weight: bold;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="yh.fabulousstars.hangman.GameController">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
-   <TextArea fx:id="logTextArea" editable="false" focusTraversable="false" prefHeight="200.0" prefWidth="600.0" />
+    <Canvas fx:id="canvas" height="400.0" width="600.0" />
+
    <HBox VBox.vgrow="NEVER">
       <children>
          <GridPane hgap="3.0" HBox.hgrow="ALWAYS">

@@ -4,13 +4,19 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import yh.fabulousstars.hangman.client.IGame;
 import yh.fabulousstars.hangman.client.IGameEvent;
 import yh.fabulousstars.hangman.client.events.GameStarted;
 import yh.fabulousstars.hangman.client.events.PlayerDamage;
 import yh.fabulousstars.hangman.client.events.PlayerJoined;
 import yh.fabulousstars.hangman.client.events.SubmitWord;
+import yh.fabulousstars.hangman.gui.CanvasClass;
 import yh.fabulousstars.hangman.localclient.GameManager;
 
 import java.net.URL;
@@ -18,13 +24,40 @@ import java.util.ResourceBundle;
 
 public class GameController implements Initializable {
 
+
+
     enum UISection {
         Create,
         Join
     }
 
     @FXML
+    private Pane parentPane;
+    @FXML
+    private Canvas canvas;
+    Scene scene;
+
+    @FXML
     public TextArea logTextArea;
+    //Canvas background
+    @FXML
+    public void addRectangle() {
+        //sout is used to check if the method is initialized
+        //System.out.println("initialize method called");
+
+        //gc = set the background color
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        gc.setFill(Color.BLUE);
+        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+        //temporary!!!
+        //Makes the 'Hangman'
+        gc.setStroke(Color.BLACK);
+        gc.moveTo(0,0);
+        gc.lineTo(canvas.getWidth()*0.5,0);
+        gc.stroke();
+
+    }
     @FXML
     public Button createButton;
     @FXML
@@ -95,6 +128,15 @@ public class GameController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
+        System.out.println("Initialized");
+        //Keeps the canvas size updated
+        canvas.widthProperty().addListener((observable, oldValue, newValue) -> addRectangle());
+        canvas.heightProperty().addListener((observable, oldValue, newValue) -> addRectangle());
+
+
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        gc.setFill(Color.BLACK);
+        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         setUIState(false, UISection.Join);
         gameManager = new GameManager(this::handleGameEvent);
     }

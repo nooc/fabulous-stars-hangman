@@ -33,18 +33,25 @@ public class GameController implements Initializable {
 
     @FXML
     private Pane parentPane;
-
     @FXML
     private Canvas canvas;
+    Scene scene;
 
     @FXML
     public TextArea logTextArea;
+    //Canvas background
     @FXML
     public void addRectangle() {
-        System.out.println("initialize method called");
+        //sout is used to check if the method is initialized
+        //System.out.println("initialize method called");
+
+        //gc = set the background color
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setFill(Color.BLUE);
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+        //temporary!!!
+        //Makes the 'Hangman'
         gc.setStroke(Color.BLACK);
         gc.moveTo(0,0);
         gc.lineTo(canvas.getWidth()*0.5,0);
@@ -73,7 +80,6 @@ public class GameController implements Initializable {
     @FXML
     public void onCreateButtonClick(ActionEvent event) {
 
-        addRectangle();
         var name = gameNameField.getText().strip();
         var playerName = playerNameField.getText().strip();
         var password = joinPasswordField.getText();
@@ -123,7 +129,10 @@ public class GameController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
 
         System.out.println("Initialized");
-        addRectangle();
+        //Keeps the canvas size updated
+        canvas.widthProperty().addListener((observable, oldValue, newValue) -> addRectangle());
+        canvas.heightProperty().addListener((observable, oldValue, newValue) -> addRectangle());
+
 
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setFill(Color.BLACK);

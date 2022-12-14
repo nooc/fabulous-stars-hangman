@@ -21,6 +21,8 @@ public class GameApplication extends Application {
         stage.setTitle("Hangman!");
         stage.setScene(scene);
         stage.show();
+
+
     }
 
     public static void main(String[] args) {

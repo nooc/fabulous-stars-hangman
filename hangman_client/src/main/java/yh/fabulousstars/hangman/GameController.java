@@ -18,18 +18,17 @@ import yh.fabulousstars.hangman.client.events.GameStarted;
 import yh.fabulousstars.hangman.client.events.PlayerDamage;
 import yh.fabulousstars.hangman.client.events.PlayerJoined;
 import yh.fabulousstars.hangman.client.events.SubmitWord;
+import yh.fabulousstars.hangman.client.GameClient;
 import yh.fabulousstars.hangman.gui.CanvasClass;
-import yh.fabulousstars.hangman.localclient.GameManager;
-
-import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 
 public class GameController implements Initializable {
 
-
+    private static final String BACKEND_URL = "http://localhost:8080";
     int guesses = 0;
     int correctGuess = 0;
+
 
     enum UISection {
         Create,
@@ -243,7 +242,7 @@ public class GameController implements Initializable {
     public ListView<String> gameListView;
     @FXML
     public Button joinButton;
-    private GameManager gameManager;
+    private GameClient gameClient;
     private ObservableList<IGame> gameList;
 
     /**
@@ -267,9 +266,13 @@ public class GameController implements Initializable {
         var playerName = playerNameField.getText().strip();
         var password = joinPasswordField.getText();
         if(!(name.isEmpty() || playerName.isEmpty())) {
+            //setUIState(false, UISection.Create, UISection.Join);
+            //gameClient.createGame(name, playerName, password);
+            
             setUIState(true, UISection.Create, UISection.Join);
             gameManager.createGame(name, playerName, password);
             gameListView.getItems().add(name+"-"+playerName);
+
         } else {
             //Show error
             //showMessage("Game & Player Name is required",Alert.AlertType.ERROR.toString());
@@ -282,7 +285,7 @@ public class GameController implements Initializable {
      * @param sections Sections
      */
     private void setUIState(boolean enabled, UISection... sections) {
-        for(var section : sections){
+        for(var section : sections) {
             if(section.equals(UISection.Create)) {
                 gameNameField.setDisable(!enabled);
                 playerNameField.setDisable(!enabled);
@@ -324,7 +327,7 @@ public class GameController implements Initializable {
         gc.setFill(Color.BLACK);
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         setUIState(false, UISection.Join);
-        gameManager = new GameManager(this::handleGameEvent);
+        gameClient = new GameClient(BACKEND_URL, this::handleGameEvent);
     }
 
     private void handleGameEvent(IGameEvent event) {

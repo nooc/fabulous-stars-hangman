@@ -1,14 +1,12 @@
 package yh.fabulousstars.hangman.client;
 
-import java.util.List;
-
 public interface IGameManager {
 
     /**
      * Get list of games.
      * @return List of games.
      */
-    List<IGame> getGames();
+    void listGames();
 
     /**
      * Create a new game.
@@ -20,8 +18,10 @@ public interface IGameManager {
     void createGame(String name, String playerName, String password);
 
     /**
-     * Get this clients unique session id.
+     * Get this client player.
      * @return is
      */
-    String getClientId();
+    IPlayer getClient();
+
+    void connect(String name, String password);
 }

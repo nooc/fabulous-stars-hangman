@@ -12,6 +12,18 @@ public interface IGame {
     String getId();
 
     /**
+     * Get players.
+     * @return list of players.
+     */
+    List<IPlayer> getPlayers();
+
+    /**
+     * Get players.
+     * @return list of players.
+     */
+    IPlayer getPlayer(String clientId);
+
+    /**
      * Get manager the game belongs to.
      * @return IGameManager instance
      */
@@ -23,22 +35,10 @@ public interface IGame {
      */
     String getName();
 
-    /**
-     * Get game theme.
-     * @return theme name
-     */
-    String getGameTheme();
+    void leave();
 
     /**
-     * Get list of players.
-     * @return List of players.
+     * Start game.
      */
-    List<IPlayer> getPlayers();
-
-    /**
-     * Join player to game.
-     * @param password
-     */
-    void join(String password);
-
+    void start();
 }

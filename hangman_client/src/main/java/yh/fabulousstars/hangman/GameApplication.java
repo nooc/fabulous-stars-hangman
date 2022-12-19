@@ -11,18 +11,23 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
 
 public class GameApplication extends Application {
+    private static Stage appStage = null;
+    public static Stage getAppStage() {
+        return appStage;
+    }
+
     @Override
     public void start(Stage stage) throws IOException {
+        appStage = stage;
         FXMLLoader fxmlLoader = new FXMLLoader(GameApplication.class.getResource("main-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), Color.GRAY);
-        Canvas canvas = new Canvas();
         stage.setTitle("Hangman!");
         stage.setScene(scene);
         stage.show();
-
-
     }
 
     public static void main(String[] args) {

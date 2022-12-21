@@ -1,6 +1,8 @@
 package yh.fabulousstars.hangman.client;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 class LocalGame implements IGame {
@@ -15,10 +17,6 @@ class LocalGame implements IGame {
         this.name = name;
         players = new HashMap<>();
 
-    }
-
-    GameManager getClient() {
-        return manager;
     }
 
     @Override
@@ -54,5 +52,9 @@ class LocalGame implements IGame {
     @Override
     public void start() {
         manager.start();
+    }
+
+    public void addPlayer(LocalPlayer player) {
+        players.put(player.getClientId(), player);
     }
 }

@@ -3,6 +3,25 @@ package yh.fabulousstars.hangman.client;
 public interface IGameManager {
 
     /**
+     * Submit player word.
+     *
+     * @param value
+     */
+    void submitWord(String value);
+
+    /**
+     * Submit player guess.
+     *
+     * @param value
+     */
+    void submitGuess(String value);
+
+    /**
+     * Say something in chat.
+     */
+    void say(String message);
+
+    /**
      * Request list of games.
      * Generates a GameList event from server.
      */
@@ -10,12 +29,14 @@ public interface IGameManager {
 
     /**
      * Join player to game.
+     *
      * @param password
      */
     void join(String gameId, String password);
 
     /**
      * Get game interface for current game.
+     *
      * @return IGame
      */
     IGame getGame();
@@ -23,19 +44,22 @@ public interface IGameManager {
     /**
      * Request creation of a new game.
      * Generates a GameCreated or CreateFailed from server.
-     * @param name Game name
+     *
+     * @param name     Game name
      * @param password Password
      */
     void createGame(String name, String password);
 
     /**
      * Get this player interface.
+     *
      * @return IPlayer
      */
     IPlayer getClient();
 
     /**
      * Connect to server.
+     *
      * @param name player name
      */
     void connect(String name);

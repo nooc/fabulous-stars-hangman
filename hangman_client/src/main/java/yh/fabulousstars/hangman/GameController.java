@@ -221,10 +221,8 @@ public class GameController implements Initializable {
         gc.fillRect(0, 0, wrapper.canvas.getWidth(), wrapper.canvas.getHeight());
 
         // Name
-        if(state != null) {
-            var player = game.getPlayer(state.getClientId());
-            gc.strokeText(player.getName(),.0, 0);
-        }
+        gc.setFont(new Font("Arial", 13));
+        gc.strokeText(wrapper.player.getName(),.20, wrapper.canvas.getHeight()-10);
 
         //Prints the black bar
         blackBarForLetter(wrapper);

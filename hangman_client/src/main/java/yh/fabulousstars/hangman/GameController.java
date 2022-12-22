@@ -74,7 +74,6 @@ public class GameController implements Initializable {
         chatTextField.setOnAction(this::onChatEntered);
         chatListView.setItems(chatList);
         playerListView.setItems(playerList);
-
     }
 
     private void onGuessEntered(ActionEvent actionEvent) {
@@ -190,6 +189,7 @@ public class GameController implements Initializable {
         canvasContainer.setMinSize(containerWidth, containerHeight);
         canvasContainer.setPrefSize(containerWidth, containerHeight);
         var scene = rootView.getScene();
+        canvasContainer.getParent().layout();
         rootView.layout();
         scene.getWindow().sizeToScene();
         drawCanvases();
@@ -203,6 +203,7 @@ public class GameController implements Initializable {
 
     public void canvasBackground(CanvasWrapper wrapper) {
 
+        var state = wrapper.player.getPlayState();
         //gc = set the background color
         //creating a rectangle covering 100% of the canvas makes it look like a background
         //The color is able to change
@@ -218,6 +219,12 @@ public class GameController implements Initializable {
         }
 
         gc.fillRect(0, 0, wrapper.canvas.getWidth(), wrapper.canvas.getHeight());
+
+        // Name
+        if(state != null) {
+            var player = game.getPlayer(state.getClientId());
+            gc.strokeText(player.getName(),.0, 0);
+        }
 
         //Prints the black bar
         blackBarForLetter(wrapper);
@@ -384,13 +391,15 @@ public class GameController implements Initializable {
 
     public void dispose() {
         music.stop();
+        this.guessTextField.setDisable(true);
+        this.chatTextField.setDisable(true);
     }
 
     public void handleGameOver(GameOver event) {
         media.getSound("success").play();
-        this.guessTextField.setDisable(true);
+        dispose();
 
-        //todo: draw winner / loser gfx
+        // todo draw winner / loser gfx
 
         if (event.isWinner()) {
             DialogHelper.showMessage("You won the game!", Alert.AlertType.CONFIRMATION);

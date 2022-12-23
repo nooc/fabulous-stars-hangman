@@ -17,6 +17,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.transform.Affine;
+import javafx.scene.transform.Translate;
 import yh.fabulousstars.hangman.client.IGame;
 import yh.fabulousstars.hangman.client.IPlayer;
 import yh.fabulousstars.hangman.client.events.*;
@@ -51,18 +54,26 @@ public class GameController implements Initializable {
     @FXML
     public VBox rootView;
     private IGame game;
-    private boolean isRunning;
+    private final Font canvasFont;
+    private final double canvasFontWidth;
+    private final Affine figureDrawingTransform;
+    private final Affine nameTransform;
 
     public GameController() {
         this.canvasMap = new HashMap<>();
         this.game = null;
-        this.isRunning = false;
+        this.canvasFont = Font.loadFont(GameApplication.class.getResourceAsStream("/RobotoMono-Medium.ttf"), 36);
+        this.canvasFontWidth = new Text("_").getLayoutBounds().getWidth();
         this.chatList = FXCollections.observableArrayList();
         this.playerList = FXCollections.observableArrayList();
         this.media = MediaHelper.getInstance();
         this.music = this.media.getMedia("8-bit-brisk-music-loop");
         this.music.setVolume(0.3);
         this.music.setCycleCount(Integer.MAX_VALUE);
+        // todo set text drawing transforms
+        var identity = new Affine();
+        this.figureDrawingTransform = identity;
+        this.nameTransform = identity;
     }
 
     @Override
@@ -148,6 +159,7 @@ public class GameController implements Initializable {
      * @param game
      */
     private void updatePlayers(IGame game) {
+        var myId = game.getManager().getClient().getClientId();
         var players = game.getPlayers();
         var clientIds = new ArrayList<String>();
         for (var player : players) {
@@ -166,13 +178,16 @@ public class GameController implements Initializable {
                 canvasMap.remove(key);
             }
         }
+        // make me first in list
+        clientIds.remove(myId);
+        clientIds.add(0, myId);
         // rebuild canvas grid
-        int count = players.size();
         int row = 0;
         int col = -1;
         canvasContainer.getChildren().clear();
         var wrappers = canvasMap.values();
-        for (var wrapper : wrappers) {
+        for (var playerId : clientIds) {
+            var wrapper = canvasMap.get(playerId);
             if (++col > 2) {
                 col = 0;
                 row++;
@@ -221,8 +236,9 @@ public class GameController implements Initializable {
         gc.fillRect(0, 0, wrapper.canvas.getWidth(), wrapper.canvas.getHeight());
 
         // Name
-        gc.setFont(new Font("Arial", 13));
-        gc.strokeText(wrapper.player.getName(),.20, wrapper.canvas.getHeight()-10);
+        gc.setFont(canvasFont);
+        gc.setTransform(nameTransform);
+        gc.strokeText(wrapper.player.getName(),0, 0);
 
         //Prints the black bar
         blackBarForLetter(wrapper);
@@ -242,19 +258,16 @@ public class GameController implements Initializable {
     public void blackBarForLetter(CanvasWrapper wrapper) {
         var state = wrapper.player.getPlayState();
         if (state != null && state.getCurrentWord() != null) {
-            int maxBarSize = 60;
-            int barWidth = (int) (wrapper.canvas.getWidth() * 0.01);
-            int barHeight = (int) (wrapper.canvas.getHeight() * 0.02);
-            int barSize = barWidth * barHeight;
-            if (barSize > maxBarSize) {
-                barSize = maxBarSize;
+
+            if(wrapper.wordTransform == null) {
+                // todo transkale and scale
+                wrapper.wordTransform = Affine.translate(wrapper.canvas.getWidth() * 0.3);
             }
+
             GraphicsContext gc = wrapper.canvas.getGraphicsContext2D();
-            //Prints the image same amount of times as a word has letters
-            var letterCount = wrapper.player.getPlayState().getCurrentWord().length;
-            for (int i = 0; letterCount > i; i++) {
-                gc.drawImage(media.getImage("BlackBarTR"), barSize * i * 1.5, wrapper.canvas.getHeight() * 0.8, barSize, wrapper.canvas.getHeight() * 0.01);
-            }
+            gc.setFont(canvasFont);
+            gc.setTransform(wrapper.wordTransform);
+            gc.strokeText(wrapper.wordLines, 0, 0);
         }
     }
 
@@ -271,6 +284,7 @@ public class GameController implements Initializable {
         if (damage > IMAGE_STATES) {
             damage = IMAGE_STATES;
         }
+        gc.setTransform(figureDrawingTransform);
         gc.drawImage(media.getImage("HangmanTranState" + damage),
                 0, 10,
                 wrapper.canvas.getWidth() * 0.3, wrapper.canvas.getHeight() * 0.5);
@@ -279,44 +293,22 @@ public class GameController implements Initializable {
     public void addWrongLetter(CanvasWrapper wrapper) {
         var state = wrapper.player.getPlayState();
         if (state != null) {
-            /*
-             * if the guess is wrong make the letter appear in red
-             * place them to the right of the hangman
-             * have a method to check if letter is correct
-             * if wrong print it on the canvas
-             */
-            int counter = -1;
-            int maxLetterSize = 100;
-            int letterSize = (int) (wrapper.canvas.getWidth() * 0.01 * wrapper.canvas.getHeight() * 0.02);
+            // if the guess is wrong make the letter appear in red
+            // place them to the right of the hangman
 
-            if (letterSize > maxLetterSize) {
-                letterSize = maxLetterSize;
-            }
+            // todo translate and scale
+            var wrongLetterTransform = ;
 
-            int rowOne = letterSize;
-            int rowTwo = letterSize * 2;
-
-            var wrontLetters = state.getWrongGuesses();
-
-            for (int i = 0; i < wrontLetters.size(); i++) {
-                int letterSpacing = counter * letterSize;
-
-                GraphicsContext gc = wrapper.canvas.getGraphicsContext2D();
-
-                gc.setFill(Color.RED);
-                gc.setFont(new Font("Arial", letterSize));
-
-                var letter = wrontLetters.get(i).toString();
-                if (i < 6) {
-                    gc.fillText(letter, 0 + letterSpacing + wrapper.canvas.getWidth() * 0.3, rowOne);
-                } else {
-                    gc.fillText(letter, 0 + letterSpacing + wrapper.canvas.getWidth() * 0.3, rowTwo);
-                }
-
-                counter++;
-                if (counter > 4) {
-                    counter = 0;
-                }
+            GraphicsContext gc = wrapper.canvas.getGraphicsContext2D();
+            gc.setFill(Color.RED);
+            gc.setFont(canvasFont);
+            gc.setTransform(wrongLetterTransform);
+            var letters = state.getWrongGuesses();
+            int row = 0;
+            double width = 0;
+            for(var letter : letters) {
+                gc.strokeText(String.valueOf(letter), width, 4);
+                width += canvasFontWidth;
             }
         }
     }
@@ -325,33 +317,12 @@ public class GameController implements Initializable {
 
         var state = wrapper.player.getPlayState();
         if (state != null && state.getCurrentWord() != null) {
-            int maxBarSize = 60;
-            int barWidth = (int) (wrapper.canvas.getWidth() * 0.01);
-            int barHeight = (int) (wrapper.canvas.getHeight() * 0.02);
-            int barSize = barWidth * barHeight;
 
-            if (barSize > maxBarSize) {
-                barSize = maxBarSize;
-            }
-            int maxLetterSize = 80;
-            int letterSize = (int) (wrapper.canvas.getWidth() * 0.01 * wrapper.canvas.getHeight() * 0.02);
-
-            if (letterSize > maxLetterSize) {
-                letterSize = maxLetterSize;
-            }
             GraphicsContext gc = wrapper.canvas.getGraphicsContext2D();
-            gc.setFill(Color.GREEN);
-            gc.setFont(new Font("Arial", letterSize));
-
-            //Prints the image same amount of times as a word has letters
-            var correctLetters = state.getCorrectGuesses();
-            for (int i = 0; i < correctLetters.length; i++) {
-
-                gc.fillText(String.valueOf(correctLetters[i]),
-                        barSize * i * 1.5,
-                        wrapper.canvas.getHeight() * 0.8,
-                        barSize);
-            }
+            gc.setFont(canvasFont);
+            gc.setTransform(wrapper.wordTransform);
+            var currentWordState = String.valueOf(state.getCorrectGuesses());
+            gc.strokeText(currentWordState, 0, 0);
         }
     }
 
@@ -409,10 +380,14 @@ public class GameController implements Initializable {
     class CanvasWrapper {
         final Canvas canvas;
         final IPlayer player;
+        String wordLines;
+        private Affine wordTransform;
 
         CanvasWrapper(Canvas canvas, IPlayer player) {
             this.canvas = canvas;
             this.player = player;
+            this.wordLines = "";
+            this.wordTransform = null;
         }
     }
 

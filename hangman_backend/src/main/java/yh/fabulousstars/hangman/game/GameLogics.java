@@ -62,12 +62,12 @@ public final class GameLogics {
      */
     public static List<EventEnvelope> makeGuess(GameState gameState, String clientId, String guess) {
         var events = new ArrayList<EventEnvelope>();
+        if(gameState.getEnded()) { return events; }
         var letter = guess.toUpperCase().charAt(0);
         var player = gameState.getPlayState(clientId);
         var opponent = gameState.getPlayState(player.getOpponentId());
         boolean foundMatch = false;
         int stateChange = 0;
-
         // process the guess.
         var word = player.getCurrentWord();
         var correct = player.getCorrectGuesses();
@@ -128,10 +128,11 @@ public final class GameLogics {
         }
 
         if (numAlive < 2) {
-            // todo: winner (alive) or 1st(dead but least damage), 2nd, .. etc
+            // winner
             if (winner != null) {
                 events.add(new EventEnvelope(winner, new GameEvent(GameEventType.Winner)));
             }
+            // losers
             for (var pState : gameState.getPlayerStates()) {
                 if (!pState.getClientId().equals(winner)) {
                     events.add(new EventEnvelope(pState.getClientId(), new GameEvent(GameEventType.Loser)));

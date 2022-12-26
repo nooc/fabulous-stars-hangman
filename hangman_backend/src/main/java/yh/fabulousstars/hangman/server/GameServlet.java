@@ -36,6 +36,7 @@ public class GameServlet extends BaseServlet {
             case "listgames" -> listGames(ctx, false);
             case "listplayers" -> listPlayers(ctx, false);
             case "start" -> startGame(ctx);
+            case "cleanup" -> cleanup(ctx);
         }
     }
 

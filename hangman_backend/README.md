@@ -27,16 +27,9 @@ To see the results of the server application, open
 
 ## Deploying
 
-### Datastore Configuration
+### Appengibe Cron Configuration
 
-Add a TTL handler for the following entities:
-
-* Event
-* Game
-* Player
-* GameState
-
-The TTL property to use is **expires**.
+Set cron to call */api/cleanup*.
 
 
 ### Maven

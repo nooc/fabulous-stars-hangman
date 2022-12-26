@@ -1,0 +1,4 @@
+cron:
+  - description: "clean expired"
+    url: /api/cleanup
+    schedule: every 10 minutes

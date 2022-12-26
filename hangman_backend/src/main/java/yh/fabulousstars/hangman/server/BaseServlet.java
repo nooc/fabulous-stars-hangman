@@ -24,6 +24,8 @@ public abstract class BaseServlet extends HttpServlet {
     private static final long ENTITY_EXPIRY_MS = 600 * 1000; // 10
     private final DatastoreService datastore; // google datastore service api
 
+    private final String[] cleanupList = new String[] { PLAYER_TYPE, GAME_TYPE, GAME_STATE_TYPE, EVENT_TYPE };
+
     protected BaseServlet() {
         super();
         this.datastore = DatastoreServiceFactory.getDatastoreService(
@@ -166,11 +168,11 @@ public abstract class BaseServlet extends HttpServlet {
      * @throws IOException
      */
     protected void poll(RequestContext ctx) throws IOException {
-
+        // set body type
         ctx.resp().setContentType("application/octet-stream");
+        // get reader
         var output = ctx.resp().getOutputStream();
-
-        // query first
+        // query oldest first
         var entityIter = datastore.prepare(
                 new Query(EVENT_TYPE)
                         .setFilter(new Query.FilterPredicate(
@@ -178,16 +180,39 @@ public abstract class BaseServlet extends HttpServlet {
                         )
                         .addSort("expires", Query.SortDirection.ASCENDING)
         ).asIterator();
-        if (entityIter.hasNext()) {
+        if (entityIter.hasNext()) { // get one
             var entity = entityIter.next();
             var bytes = EntityUtils.getBlobBytes(entity);
             datastore.delete(entity.getKey());
             output.write(bytes);
-            return;
+        } else { // no events. send idle
+            // empty
+            var idle = ObjectHelper.toBytes(new GameEvent(GameEventType.Idle));
+            output.write(idle);
         }
-        // empty
-        var idle = ObjectHelper.toBytes(new GameEvent(GameEventType.Idle));
-        output.write(idle);
+    }
+
+    /**
+     * Cleanup expired entities.
+     * @param ctx
+     */
+    protected void cleanup(RequestContext ctx) {
+        if(ctx.req().getHeader("X-Appengine-Cron") != null) { // app engine cron call
+            var now = new Date();
+            var keys = new ArrayList<Key>();
+            for (var type : cleanupList) {
+                var iter = prepare(new Query(type)
+                        .setFilter(new Query.FilterPredicate("expires", Query.FilterOperator.LESS_THAN_OR_EQUAL, now))
+                        .setKeysOnly()
+                ).asIterator();
+                while (iter.hasNext()) {
+                    keys.add(iter.next().getKey());
+                }
+            }
+            if (!keys.isEmpty()) {
+                datastore.delete(keys);
+            }
+        }
     }
 
     /**
